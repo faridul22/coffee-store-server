@@ -74,15 +74,40 @@ async function run() {
         })
 
         // User related api
-
         app.get('/users', async (req, res) => {
             const users = await usersCollection.find().toArray();
             res.send(users)
+        });
+
+        app.get('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await usersCollection.findOne(query)
+            res.send(result)
         })
 
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
+            res.send(result)
+        })
+
+        app.patch('/users', async (req, res) => {
+            const user = req.body;
+            const query = { email: user.email };
+            const updatedDoc = {
+                $set: {
+                    lastLoggedAt: user.lastLoggedAt
+                }
+            }
+            const result = await usersCollection.updateOne(query, updatedDoc)
+            res.send(result)
+        })
+
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await usersCollection.deleteOne(query);
             res.send(result)
         })
 
